@@ -11,11 +11,9 @@ This workshop will go over the basics of python showing the syntax by utilizing 
 1. [The Syntax](#the-syntax)
     * [Comments](#comments)
     * [Basic Hello World](#basic-hello-world)
-2. [Conditional Statements](#conditional-statements)
-3. [Loops](#loops)
-4. [String Manipulation and Output](#string-manipulation-and-output)
-5. [File read and write](#file-read-and-write)
-6. [Reading Error Messages](#reading-error-messages)
+2. [Data Types and Conditional Statements](#data-types-and-conditional-statements)
+3. [Loops and Iterations](#loops-and-iterations)
+4. [File Read and Write](#file-read-and-write)
 
 # Beginner
 
@@ -123,7 +121,7 @@ Hello World!
 Hello World!
 ```
 
-## Conditional Statements
+# Data Types and Conditional StatementsG
 Everything in Python are objects, so, if an object is empty, it contains the "object" __None__. None, is very important in conditionals, making things simpler when you are checking for passed objects from another function.
 
 To show this example, let us introduce lists. Lists are like Arrays, but in Python it is called a __List__. It starts with brackets: `[]` and contains integers or strings or other objects:
@@ -189,7 +187,7 @@ Output:
 
 Note, that it will show up as a list and not as __None__ is because the type is a list, but since it is empty, it is considered a __None__
 
-If you set 
+If you set
 ```python
 testing = None
 
@@ -199,3 +197,193 @@ Output:
 ```
 <class 'NoneType'>
 ```
+
+More on conditionals, we can use negated statements, such as "if not this"
+```python
+mandatory_list = []
+
+if not mandatory_list:
+    print("Ready and empty")
+```
+Output:
+```
+Ready and empty
+```
+
+The reason this worked is because the list returned true on the fact that it is a None. Since we negatively checked a None objected list, it matched and returned.
+Let's dive into and and or statements in conditional if statements:
+
+```python
+var1 = []
+var2 = [1,2,3]
+var3 = [2,3,4]
+
+if var1 and var2 and var3:
+    print("all variables have contents")
+
+if var1 or var2 or var3:
+    print("some variables have contents")
+```
+
+You should run this and see what happens
+
+Equalities are matched with `is`, `in` or `==`. The latter is used if the equation is being matched with a string specifically
+
+```python
+var1 = 1
+var2 = 2
+var11 = 1
+
+if var1 is var11:
+    print(1)
+
+if var1 == var11:
+    print(1)
+
+if var1 in var11:
+    print(1)
+```
+
+Now, run this and see what happens? When does the error happen and what does it mean?o
+
+Let's move on to Loops and iterations, hence the error is related.
+
+# Loops and Iterations
+The error above mentions that the type `int` is not __iterable__, now this occurs because iteration means that you are looping through a certain type of data, for example ,we looked over lists. Lists can have multiple lists inside of them, or multiple dictionaries inside of them as well. So, for example, if let's say you have a list of numbers and you want to go through them one by one to make sure they are all accounted for, you would do something like this:
+
+```python
+my_list = [1,4,65,2,234,5,234,234,32]
+
+for item in my_list:
+    print(f"my current number is {item}\n")
+```
+
+Run this and see what happens. Now, you'd raise a question, if you know languages like C, they use indexes. Python does not really require indexes, however, you CAN enable it by doing so:
+
+```python
+my_list = [1,4,65,2,234,5,234,234,32]
+
+for id,dx in enumerate(my_list):
+    print(f"Current item: {id} has the value of {dx}")
+```
+
+Run this and see what returns
+
+
+Now, let's do something odd and stop the loop in the middle as it finds a specific value:
+
+```python
+my_list = [1,4,65,2,234,5,234,234,32]
+
+for item in my_list:
+    if item is 234:
+        print("Found!")
+        break
+```
+
+There are more things like this, `continue` will not END the function but will stop the loop for example, however, `return` will END your function. Speaking of functions, we will cover it after the while loop.
+
+Note that, we do not have switch / cases in Python.
+
+```python
+my_list = [1,2,3,4,5,6,7,8,9]
+
+while(True):
+    for item in my_list:
+        if item is 7:
+            return
+```
+
+Run this and see what happens.
+
+Finally, let's do some text animation!
+```python
+import itertools
+import sys
+anim = ['-','\\','|','/']
+rr = itertools.cycle(anim)
+
+my_list = [1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0]
+
+for item in my_list:
+    sys.stdout.write("[{anim}] Some nice text animation    \t\r".format(
+        anim=next(rr)
+    ))
+    sys.stdout.flush()
+```
+
+Looping through a dictionary is the same thing, but you will now need to utilize the names of the dictionary keys to get their values.
+Dictionaries are of the following sort:
+```json
+{
+    "key":"value"
+}
+```
+
+In python, there's a .keys() function that can be used against dictionary objects and .values() function.
+In this case, let's look at the dat aprovided below:
+
+```python
+{
+    "name":"yourname here",
+    "age": 51,
+    "school": "CSUN",
+    "items": [1,2,3,4,5],
+    "another_object":[
+        {
+            "liked":234,
+            "name":"Heavenly item"
+        },
+        {
+            "liked":255,
+            "name":"Limited burger"
+        }
+    ]
+}
+```
+
+For example, if we wish to grab the liked names from the object "another_object" which is a list that contains two dictionaries, we would do the following:
+
+```python
+for item in mydict.get('another_object'):
+    print(item.get('liked'))
+```
+
+NOTE: You can also do this as the following:
+```python
+for item in mydict.['another_object']:
+    print(item['liked'])
+```
+It's just that, if you are looping throuhg some data, and some data has the key "another_object" and some does not have the key "another_object" your program will crash. Thus, using .get() will return a None object in the case that some data does not exist that you are trying to get something from.
+
+You can read the documentation on itertools and discover newer things! https://docs.python.org/3/library/itertools.html
+Reading documentation is very important and the best thing you can do to figure out how to utilize the library you imported fully. We will talk about more about this in the Intermediate section.
+
+# File Read and Write
+I will go over this very simply, you can read files and write to files with simple commands, but the most easy way to do this (without closing the file) is using the `with` functionality
+
+```python
+with open("filename.txt", 'r') as f:
+    temporaryvar = f.readlines()
+```
+
+This will read ALL the lines, it will include `\n\r` as well. We do not need that, so instead, we can use the following function:
+
+You can do
+```python
+temporaryvar = f.read().splitlines()
+```
+
+This will read the lines, but without the newlines `\n\r`
+
+To write to a file, we need to __Append__, so we use the `a` instead of `r` (for Read)
+
+```python
+with open("newfile.txt", 'a') as f:
+    f.write("your text here :) \n")
+```
+
+Remember to have a new line character `\n` at the end of your written string though.
+
+
+Note, the beginner part is missing functions. We will talk about them in the intermediate area.

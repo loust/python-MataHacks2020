@@ -1,0 +1,13 @@
+1. Create a python script that will output the following text using a loop:
+(This is the 1st item.
+This is the 2nd item.
+This is the 3rd item.
+This is the 4th item.
+This is the 5th item.
+And this is the last item, 6th.)
+
+
+2. Write a script that will de duplicate the list below:
+    my_list = [1,2,3,4,5,6,7,8,9,0,1,23,4,42,5,3456,2,23,12,23,32,23,23,14,5,576,567,57,57,2,23,434,5,576,76,534,23,234,234,234,23]
+
+3. Look through the virustotal_output.json file and find the "SentinelOne" result
