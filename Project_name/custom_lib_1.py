@@ -11,3 +11,6 @@ class custom_lib_1:
         self
     ):
         print("Hello")
+
+
+from Project_name.custom_lib_1 import custom_lib_1 as cl1

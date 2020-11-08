@@ -1,0 +1,8 @@
+1. Go to this website: https://templatemo.com/tag/gallery and review the source code
+    a. Notice that it has some .jpg URLs? Now, create a script that will
+    harvest this URL via requests.
+    b. Now, grab all the URLs with ".jpg" and append it to a list
+    c. Use ThreadingExecutorPool to create 5 workers and download all images,
+    saving them to a file.
+
+2. In addition to the first question, add a KeyboardInterrupt to skip a potential image download

@@ -20,6 +20,11 @@ This workshop will go over the basics of python showing the syntax by utilizing 
 2. [GET and POST requests for API connections](#get-and-post-requests-for-api-connections)
 3. [sqlite3 connections and integration](#sqlite3-connections-and-integration)
 
+* [Advanced](#advanced)
+1. [Multithreading](#multithreading)
+2. [Multiprocessing](#multiprocessing)
+3. [Exception Management](#exception-management)
+
 # Beginner
 
 # Setup and Requirements
@@ -533,4 +538,236 @@ with sqlite3.connect(':memory:') as con:
     cur.execute("SELECT * FROM tablename")
     item = cur.fetchone() # You can also use fetchall()
 ```
+# Advanced
 
+## Multithreading
+This is related to functions that are network based. So, when you are developing some application that is a downloader, which downloads images from several URLs, using threading would download things in parallel theoretically.
+
+We will discus the concurrent futures ThreadPoolExecutor features instead of using the threading library itself. This is simpler to visualize and organize.
+
+Here is a snippet from the documentation found here: https://docs.python.org/3/library/concurrent.futures.html
+
+```python
+import concurrent.futures
+import urllib.request
+
+URLS = ['http://www.foxnews.com/',
+        'http://www.cnn.com/',
+        'http://europe.wsj.com/',
+        'http://www.bbc.co.uk/',
+        'http://some-made-up-domain.com/']
+
+# Retrieve a single page and report the URL and contents
+def load_url(url, timeout):
+    with urllib.request.urlopen(url, timeout=timeout) as conn:
+        return conn.read()
+
+# We can use a with statement to ensure threads are cleaned up promptly
+with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+    # Start the load operations and mark each future with its URL
+    future_to_url = {executor.submit(load_url, url, 60): url for url in URLS}
+    for future in concurrent.futures.as_completed(future_to_url):
+        url = future_to_url[future]
+        try:
+            data = future.result()
+        except Exception as exc:
+            print('%r generated an exception: %s' % (url, exc))
+        else:
+            print('%r page is %d bytes' % (url, len(data)))
+```
+
+The most important thing to take out of this is the following:
+```python
+with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+```
+The above line creates a threading pool. Think about it as a controller that rallies "workers" by assigning them your function
+Notice above that the function `def load_url` is loading a URL with a variable integer of a timeout. This is passed by in the threading area.
+
+Notice that the example is a bit confusing if you have not done single line for loops. Single line for loops look like this:
+
+```python
+variable = [item for item in items]
+```
+This is similar to doing the following:
+```python
+variable = []
+for item in items:
+    variable.append(item)
+```
+
+Notice the `[]` brackets outside of the single line for loop after the equation.
+Now, in this example, they assign the function of `load_url` directly with a single line loop as follows:
+```python
+future_to_url = {executor.submit(load_url, url, 60): url for url in URLS}
+```
+Another thing to mention is the `executor.submit` function. There is an `executor.map` as well. The difference is that, `submit` schedules the callable function to be executed, and returns a __Futures__ object. The `map` collects the iterables immediately in addition to the function being executed asynchronously.
+
+In another way, you could have done it this way:
+```python
+with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+    future_to_url_1 = executor.submit(load_url, 'https://google.com/', 60)
+    future_to_url_2 = executor.submit(load_url, 'https://yahoo.com/', 60)
+```
+
+Notice how the function `load_url` has two parameters as `URL and TIMEOUT`. When you call the function `executor.submit` you are passing the function `load_url` without the `()`s thus, you need to put the function's parameteres right next to it.
+
+
+So, the idea of multithreading and processing is that, you create a function to do your job, you pass it to the PoolExecutor, which assigns workers and then, runs them in parallel.
+
+To debug your program and see if your process is saving time, you can do the following before and after you run your code:
+
+```python
+import time
+
+t1 = time.perf_counter()
+
+# ... Do some work here
+
+t2 = time.perf_counter()
+
+print(f"Finished! Time took: {t2-t1}")
+
+Note, alternatively, there is another library called threading, you can see an example here from this stackoverflow: https://stackoverflow.com/questions/47995566/threadpoolexecutor-vs-threading-thread
+It is a bit similar in ideology, but the PoolExecutor version does this in less lines of code.
+
+## Multiprocessing
+This is related to functions that are CPU based. Note, that we will be using the same futures' technique, which means it's in the same documentation: https://docs.python.org/3/library/concurrent.futures.html#concurrent.futures.ProcessPoolExecutor
+
+This means that, the code will look very similar, you do not need to learn two different libraries. The ProcessPoolExecutor utilizes the `multiprocessing` module and simplifies the writing and creating parallel processing scripts.
+
+Remember, multi processing is for, for example, copying mass amount of files, calculating primes, doing complex jobs that requires CPU
+
+As a side note, if you want to do things via GPU, you cannot run these multiprocessing methods using GPU code. In this case, you will need to look into this: https://documen.tician.de/pycuda/
+
+Regardless, let's get into multiprocessing with a simple example, and examine how similar the structure is:
+
+```python
+import concurrent.futures
+import math
+
+PRIMES = [
+    112272535095293,
+    112582705942171,
+    112272535095293,
+    115280095190773,
+    115797848077099,
+    1099726899285419]
+
+def is_prime(n):
+    if n < 2:
+        return False
+    if n == 2:
+        return True
+    if n % 2 == 0:
+        return False
+
+    sqrt_n = int(math.floor(math.sqrt(n)))
+    for i in range(3, sqrt_n + 1, 2):
+        if n % i == 0:
+            return False
+    return True
+
+def main():
+    with concurrent.futures.ProcessPoolExecutor() as executor:
+        for number, prime in zip(PRIMES, executor.map(is_prime, PRIMES)):
+            print('%d is prime: %s' % (number, prime))
+
+if __name__ == '__main__':
+    main()
+```
+Now, we don't really mind the function itself, but in this case, it's a prime function. So, what the important part here is this line:
+```python
+with concurrent.futures.ProcessPoolExecutor() as executor:
+```
+This line utilizes the `ProcessPoolExecutor` with no workers. However, you can give workers as follows:
+```python
+ProcessPoolExecutor(max_workers=3)
+```
+
+Now, if we look into the following for loop that they create, we see that they use the `zip()` function in the loop.
+The `zip()` function is used for parallel iteration, so, it will go through both objects in parallel (at the same time)
+
+The way this happens, is that, your CPU cannot operate in parallel technically. So, in computers, parallel means that it executes one thing, then moves to another function, executes that, then comes back to the original function. This continues on, and visually, we see them working in parallel together. This is generally what multiprocessing and multithreading does.
+
+
+Notice how the `executor.map` is being called instead of `executor.submit` As a challenge, you should change this to `executor.submit` and see what the differences are by using the time calculations. However, as stated in the documentation and above, the `executor.map` is for asynchronous execution.
+
+## Exception management
+So, let's head over to this website: https://www.programiz.com/python-programming/exceptions
+
+Scroll down a bit, and you will see the bolded title called __Python Built-in Exceptions__ We are just looking at this for now. You can read the entire thing and learn from there, but I will summarize most of the exception handling here:
+
+Exceptions are basically the "catching" of errors instead of getting your program to crash. We can do this using the `try` and `except` feature in Python.
+
+```python
+try:
+    # Some code here that is bound to break
+except:
+    # error message output
+```
+Now, you can customize the error output message, which is the goal of this topic, for example:
+```python
+try:
+    # Some bad workarounds here
+except as e:
+    print(e"The error was due to {e}")
+```
+
+
+Now, if you look at the article, we can see that there are some more exception values. We used `e` earlier as a parameter for the error passing in. This means, there are different types of errors in Python, and you can catch all of them. Even custom error exceptions in custom libraries.
+
+Let's go over the `KeyboardInterrupt` exception handler and catch the Ctrl+C.
+
+```python
+import time
+a = [1,2,3,4,5,6,7,8,9]
+for item in a:
+    try:
+        print(item)
+        time.sleep(5)
+    except KeyboardInterrupt as e:
+        print(f"skipped {e}")
+```
+
+This will continue on the for loop, but whenever you hit the Ctrl+C, it will NOT kill the entire program! It will ONLY skip the current number in the loop as you see it for yourself. Run this and try it ou!
+
+In addition to exceptions, you can use multiple exception handlers. You can use another `except` under another. And you can end it with `else` for the final
+
+For example, you can do something like this. Let's say you're downloading something and saving it to a file.
+
+```python
+try:
+    # code to download something
+    # code to save something to a file
+except (URLError, ValueError):
+    # handle it here
+except SocketTimeout:
+    # Upon a socket timeout, what should we do?
+except OSError:
+    # OS related error. Is the file not found? Not created?
+else:
+    In the end, something else happened. What do we do here?
+```
+
+
+There are several other ways to stop or ignore exceptions, such as:
+```python
+try:
+    # go through a look, I don't care if it misses anything or errors out
+except:
+    pass
+```
+
+`pass` is used to not output anything and continue. Similar to `conitnue` or `break`, but it basically follows the process normally, ignoring the exception text output without leaving the `except` blank, since t hat will result in an error.
+
+These were built-in exceptions from Python. Let's say you're using the `reuests` module, and want to see what they exceptions are:
+Let's check out their documentation: https://requests.readthedocs.io/en/master/_modules/requests/exceptions/
+
+Let's say there's a requests exception, you can use it as follows:
+```python
+import requests
+try:
+    # Do something with requests
+except requests.RequestsException as e:
+    # Output a message
+```
