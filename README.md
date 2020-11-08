@@ -4,14 +4,19 @@
 This workshop will go over the basics of python showing the syntax by utilizing the ideas of general programming.
 
 # Content
+
+* [Beginner](#Beginner)
 0. [Setup and Requirements](#setup-and-requirements)
     * [Linux / Mac](#linux-mac)
 1. [The Syntax](#the-syntax)
+    * [Comments](#comments)
 2. [Conditional Statements](#conditional-statements)
 3. [Loops](#loops)
 4. [String Manipulation and Output](#string-manipulation-and-output)
 5. [File read and write](#file-read-and-write)
 6. [Reading Error Messages](#reading-error-messages)
+
+# Beginner
 
 # Setup and Requirements
 ## Windows
@@ -47,4 +52,71 @@ Before we begin, to avoid writing messy code, you should skim through, or read t
 
 As we observe the document, they state that spaces are preferred method. You need to use a text editor that does the indentation automatically to avoid manual entry of spaces or tabs to indent, which will cause errors to occur.
 
+## Comments
+Comments are done using the pound sign `#` and tripple double quotes: `"""` For example:
+```python
+# This is a comment
 
+"""
+This is a longer
+Comment
+"""
+```
+## Basic Hello World
+Let's go over basic hello world examples and end up with string manipulations:
+
+```python
+print("Hello World!")
+```
+Outputs:
+```bash
+Hello World
+```
+
+```python
+variable1 = "Hello"
+variable2 = "World!"
+
+print(variable1 + " " + variable2)
+```
+
+Output:
+```bash
+Hello World!
+```
+The above is the old way of appending strings together
+
+```python
+var1 = "Hello"
+var2 = "World!"
+
+print(var1, " ", var2)
+```
+Output:
+```bash
+Hello World!
+```
+
+```python
+var1 = "Hello"
+var2 = "World!"
+
+print("{first} {second}".format(
+        first=var1,
+        second=var2
+))
+
+print("{0} {1}".format(
+        var1,
+        var2
+))
+
+print(f"{var1} {var2}")
+```
+
+Output:
+```bash
+Hello World!
+Hello World!
+Hello World!
+```
