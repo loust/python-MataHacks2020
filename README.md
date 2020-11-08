@@ -106,7 +106,7 @@ print("{first} {second}".format(
         second=var2
 ))
 
-print("{0} {1}".format(
+print("{} {}".format(
         var1,
         var2
 ))
