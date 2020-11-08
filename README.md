@@ -10,6 +10,7 @@ This workshop will go over the basics of python showing the syntax by utilizing 
     * [Linux / Mac](#linux-mac)
 1. [The Syntax](#the-syntax)
     * [Comments](#comments)
+    * [Basic Hello World](#basic-hello-world)
 2. [Conditional Statements](#conditional-statements)
 3. [Loops](#loops)
 4. [String Manipulation and Output](#string-manipulation-and-output)
@@ -94,8 +95,9 @@ print(var1, " ", var2)
 ```
 Output:
 ```bash
-Hello World!
+Hello   World!
 ```
+Note that, the comma `,` separations will add spaces.
 
 ```python
 var1 = "Hello"
@@ -119,4 +121,81 @@ Output:
 Hello World!
 Hello World!
 Hello World!
+```
+
+## Conditional Statements
+Everything in Python are objects, so, if an object is empty, it contains the "object" __None__. None, is very important in conditionals, making things simpler when you are checking for passed objects from another function.
+
+To show this example, let us introduce lists. Lists are like Arrays, but in Python it is called a __List__. It starts with brackets: `[]` and contains integers or strings or other objects:
+```
+[1, 2, 3]
+["1", "2", "3"]
+[object1, object2, object3]
+[{},{},{}]
+```
+
+Oh, and there are also dictionaries. Dictionaries are encapsulated with braces `{}` this is similar to a JSON object, but it is called a list. There is no restriction in using single quotes or double quotes, as JSON requires double quotes.
+
+```python
+{
+    "name":"yourname here",
+    "age": 51,
+    "school": "CSUN",
+    "items": [1,2,3,4,5],
+    "another_object":[
+        {
+            "liked":234,
+            "name":"Heavenly item"
+        },
+        {
+            "liked":255,
+            "name":"Limited burger"
+        }
+    ]
+}
+```
+
+```python
+some_object = [1,2,3]
+some_other_object = []
+
+if some_object:
+    print("This will show")
+
+if some_other_object:
+    print("This will NOT show")
+```
+
+Output:
+```
+This will show
+```
+
+The reason the one called "This will NOT show" did not display is because we checked if the item was empty or not. This is the correct way to check if an item is empty or not. By checking if it is __None__ or has items in it.
+
+Let's see what these items are:
+```python
+some_object = [1,2,3]
+some_other_object = []
+
+print(type(some_object))
+print(type(some_other_object))
+```
+Output:
+```bash
+<class 'list'>
+<class 'list'>
+```
+
+Note, that it will show up as a list and not as __None__ is because the type is a list, but since it is empty, it is considered a __None__
+
+If you set 
+```python
+testing = None
+
+print(type(testing))
+```
+Output:
+```
+<class 'NoneType'>
 ```
