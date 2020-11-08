@@ -15,6 +15,11 @@ This workshop will go over the basics of python showing the syntax by utilizing 
 3. [Loops and Iterations](#loops-and-iterations)
 4. [File Read and Write](#file-read-and-write)
 
+* [Intermediate](#Intermediate)
+1. [Library Project Structure](#library-project-structure)
+2. [GET and POST requests for API connections](#get-and-post-requests-for-api-connections)
+3. [sqlite3 connections and integration](#sqlite3-connections-and-integration)
+
 # Beginner
 
 # Setup and Requirements
@@ -387,3 +392,145 @@ Remember to have a new line character `\n` at the end of your written string tho
 
 
 Note, the beginner part is missing functions. We will talk about them in the intermediate area.
+
+# Intermediate
+
+## Library Project Structure
+Usually, when you write a simple script, it's just your python file that does the job, you're going to be running it as follows:
+```bash
+python3 ./myscript.py
+```
+
+And in a lot of times, you will see yourself re-writing your scripts all over again. Instead, you can make your own library of most-used functions and scripts to reuse them in other places as well. This will go over the basic sctructure of a Python class and a custom library.
+
+The types of files and folders that you will find in a python library will be similar to this:
+
+```
+<Project_name>
+    - __init__.py
+    - __main__.py
+    - project_name.py
+    - custom_lib_1.py
+    - custom_lib_2.py
+```
+
+So, this is a VERY basic class structure. It does not have any folders, but you can add them on later. Though, in this case, we have files like __init__ and __main__ that can be left blank for now.
+The `project_name.py` is the one you will use as the main interface for your two custom libraries on the side.
+
+Look at the folder `Project_name` in this repo to see the simple structure of it.
+
+Now, we can run the following to see where python is installed
+
+```python
+import sys
+print(sys.path)
+```
+
+Run the above command to see where you should put that project directory that you created. Then, this will allow you to use this library of functions in any other codebase.
+
+Usually, it's in the user's home directory in .local: `~/.local/lib/python3.X/site-packages` This directory is good enough for debugging. After your library is ready for release, you can package it with pip after approval, but this workshop will not cover that.
+
+# GET and POST requests for API connections
+Doing GET and POST requests are very conventional, though, there are two ways of doing it. One is just directly calling a GET function with the `requests` library, and the other is to create a session with the `requests` library. To keep it more convenient, this workshop will only show the session creation to keep things stable.
+
+NOTE: You can get every information about `requests` from their documentation: https://requests.readthedocs.io/en/master/user/advanced/
+
+Here are the quick and dirty noites on how to get a session up and maintain it:
+
+```python
+import getpass
+s = requests.Session() # Create a session
+
+# The headers will be updated. Let's say an API requires that you send them a specific header value,
+# This is used there.
+s.headers.update(
+    {
+            "Content-Type": "text/html"
+    }
+)
+
+username = input("Enter your username: ")
+password = getpass.getpass(prompt="Enter the Password: ")
+
+s.auth = (username, password) # Remember to always hide the password, and make it an input
+
+# Note, if you need to save the password somewhere, the best place to put it is outside of the script itself,
+a database would be good. Encrypted databases would be better. API Integration in the OS itself would be ideal.
+
+result = s.get("https://contenthere")
+```
+
+The same thing can be said for POST requests. Instead of .get() you can use .post(), but for POST, you need to send in data, and the way you do this is to append data as you did to headers
+
+From an example from
+
+```python
+from requests import Request, Session
+
+s = Session()
+
+req = Request('POST', url, data=data, headers=headers)
+prepped = req.prepare()
+
+# do something with prepped.body
+prepped.body = 'No, I want exactly this as the body.'
+
+# do something with prepped.headers
+del prepped.headers['Content-Type']
+
+resp = s.send(prepped,
+    stream=stream,
+    verify=verify,
+    proxies=proxies,
+    cert=cert,
+    timeout=timeout
+)
+
+print(resp.status_code)
+```
+
+
+Let's head to http://dummy.restapiexample.com/ and try to grab some data from there.
+
+Try to do GET requests of this URL: http://dummy.restapiexample.com/api/v1/employee/1
+You may get 429, but you can keep trying.
+You will get the following:
+```json
+{"status":"success","data":{"id":1,"employee_name":"Tiger Nixon","employee_salary":320800,"employee_age":61,"profile_image":""},"message":"Successfully! Record has been fetched."}
+```
+
+Now, to move on to the following, let's add these values to a SQL database using `sqlite3`
+
+# sqlite3 connections and integration
+You can view my other repository, which includes some sample SQL commands, but regardless, here is a quick note on how to connect to the sqlite3 engine from Python to add or get information:
+
+```python
+import sqlite3
+
+def dict_factory(cursor, row):
+    d = {}
+    for idx, col in enumerate(cursor.description):
+        d[col[0]] = row[idx]
+    return d
+
+with sqlite3.connect('database.db') as con:
+    con.row_factory = dict_factory
+    cur = con.cursor()
+    cur.execute("SELECT * FROM tablename")
+    cur.commit() # Commit is mostly used when you change something in the Database, not SELECT
+    item = cur.fetchone() # You can also use fetchall()
+```
+Notice the dict_factory, this function overwrites how the sqlite3 outputs data. Instead of outputting it as a list without any keys, it converts it to a dictionary, making it easier to get items if you are dealing with a lot of data.
+
+Note that, alternatively, you can leave things in the memory instead of creating a file for the database. This is done via:
+
+```python
+import sqlite3
+
+with sqlite3.connect(':memory:') as con:
+    con.row_factory = dict_factory
+    cur = con.cursor()
+    cur.execute("SELECT * FROM tablename")
+    item = cur.fetchone() # You can also use fetchall()
+```
+

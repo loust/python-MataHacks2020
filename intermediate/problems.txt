@@ -1,0 +1,4 @@
+1. Visit my other repository to setup sqlitestudio https://github.com/loust/layer8-python
+2. Look over the virustotal_output.json from the /beginner folder and try to calculate the average verage that have reported positive on this malware
+3. Visit https://reqres.in/ and write a script to display all the data in a CSV format.
+4. Visit https://jsonplaceholder.typicode.com/ and write a script to insert some of the data into your sqlite2 database
